@@ -15,20 +15,19 @@
                     "interactions": "",
                     "initialStateCheck": true,
                     "priority": 0
+                },
+                {
+                    "name": "Run",
+                    "type": "Value",
+                    "id": "691ced5c-9837-4d55-acd7-951521b685e8",
+                    "expectedControlType": "Integer",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true,
+                    "priority": 0
                 }
             ],
             "bindings": [
-                {
-                    "name": "",
-                    "id": "59b860ae-a9a5-478f-99bb-66f041764cbf",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Movement",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
                 {
                     "name": "WASD",
                     "id": "6b7cffc1-5193-40f4-b7af-5ae023857f31",
@@ -43,7 +42,7 @@
                 {
                     "name": "up",
                     "id": "f8ccdb0d-6216-4dc7-bdbd-35504873c4ad",
-                    "path": "<Keyboard>/u",
+                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -83,6 +82,17 @@
                     "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "41429b9c-f199-4675-b8d6-f8ba95094e02",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Run",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }
