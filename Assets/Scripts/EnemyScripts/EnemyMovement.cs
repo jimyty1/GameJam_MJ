@@ -19,9 +19,21 @@ public class EnemyMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
     }
-    void IdleLoop()
+    private void OnMovement()
     {
-        
+        Debug.Log("Movement Input: " + movement);
+
+        if (movement.x!= 0 || movement.y != 0)
+        {
+            animator.SetFloat("X", movement.x);
+            animator.SetFloat("Y", movement.y);
+            animator.SetBool("isWalking", true);
+        }
+        else
+        {
+            animator.SetBool("isWalking", false);
+        }
+    
     }
     private void FixedUpdate()
     {
@@ -42,6 +54,7 @@ public class EnemyMovement : MonoBehaviour
     void CalcuateNewMovementVector(){
     //create a random direction vector with the magnitude of 1, later multiply it with the velocity of the enemy
         movement = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized;
+        OnMovement();
     }
 
 }
