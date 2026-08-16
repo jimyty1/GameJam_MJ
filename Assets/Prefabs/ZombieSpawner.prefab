@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99ec485d1a7344a81a340e77a306d114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _zombiePrefab: {fileID: 8361462032461909002, guid: 9d7e31d5c4dca447b9e11a581c5fe4c2, type: 3}
+  _zombiePrefab: {fileID: 459725614705208527, guid: 94bfad4259e1e4b18817b8c955bfa7bb, type: 3}
   _minimumSpawnTime: 5
   _maximumSpawnTime: 10
   _timeUntilSpawn: 0

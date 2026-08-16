@@ -1,29 +1,80 @@
-using System;
-using Unity.VisualScripting;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class EnemyMovement : MonoBehaviour
 {
-    Rigidbody2D rb;
-    private Vector2 movement;
-    [SerializeField] float moveSpeed = 3;
-    Animator animator;
-    [SerializeField] float runMod = 1.45f;
+    [Header("References")]
+    public Rigidbody2D rb;
+    private Animator animator;
+    private GameObject player;
 
+    [Header("Movement Settings")]
+    public float moveSpeed = 3f;
+    [SerializeField] float runMod = 1.45f;
+    private Vector2 movement;
+
+    [Header("Wander Settings")]
     private float latestDirectionChangeTime;
     private readonly float directionChangeTime = 3f;
+    private Collider2D collider;
+
+    [Header("Line of Sight Settings")]
+    public bool hasLOS = false;
+    [SerializeField] private float viewDistance = 10f;
+    // IMPORTANT: This mask must include BOTH the Player layer AND the Obstacle/Wall layer
+    [SerializeField] private LayerMask targetLayers; 
     
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        player = GameObject.FindGameObjectWithTag("Player");
+        latestDirectionChangeTime = 0f;
+        collider = GetComponent<Collider2D>(); 
+        CalculateNewMovementVector();
     }
-    private void OnMovement()
-    {
-        Debug.Log("Movement Input: " + movement);
 
-        if (movement.x!= 0 || movement.y != 0)
+    void Update()
+    {
+        // 1. Handle AI Logic & Input Vectors in Update
+        if (hasLOS && player != null)
+        {
+            // Normalized so speed remains constant regardless of distance
+            movement = ((Vector2)(player.transform.position - transform.position)).normalized;
+        }
+        else
+        {
+            if (Time.time - latestDirectionChangeTime > directionChangeTime)
+            {
+                latestDirectionChangeTime = Time.time;
+                CalculateNewMovementVector();
+            }
+        }
+
+        // 2. Keep animations updated every frame
+        UpdateAnimation();
+    }
+
+    private void FixedUpdate()
+    {
+        // 3. Handle Physics Movement here
+        float currentSpeed = moveSpeed * (hasLOS ? runMod : 1f); 
+        rb.MovePosition(rb.position + movement * currentSpeed * Time.fixedDeltaTime);
+
+        // 4. Handle Raycasting
+        if (player != null)
+        {
+            CheckLineOfSight();
+        }
+    }
+
+    void CalculateNewMovementVector()
+    {
+        movement = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized;
+    }
+
+    private void UpdateAnimation()
+    {
+        if (movement.sqrMagnitude > 0.01f) 
         {
             animator.SetFloat("X", movement.x);
             animator.SetFloat("Y", movement.y);
@@ -33,28 +84,42 @@ public class EnemyMovement : MonoBehaviour
         {
             animator.SetBool("isWalking", false);
         }
-    
     }
-    private void FixedUpdate()
+
+    private void CheckLineOfSight()
     {
-        if (Time.time - latestDirectionChangeTime > directionChangeTime){
-            latestDirectionChangeTime = Time.time;
-            CalcuateNewMovementVector();
+        Vector2 origin = transform.position;
+        Vector2 direction = (Vector2)(player.transform.position - transform.position);
+        float distance = direction.magnitude;
+
+        // Caps the raycast to a max view distance so enemies don't see across the whole map
+        if (distance > viewDistance)
+        {
+            hasLOS = false;
+            Debug.DrawRay(origin, direction.normalized * viewDistance, Color.red);
+            return;
         }
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime * (1+runMod));
+
+        RaycastHit2D ray = Physics2D.Raycast(origin, direction.normalized, distance, targetLayers);
+        
+        if (ray.collider != null)
+        {
+            // If the first thing the ray hits is the player, we have LOS
+            hasLOS = ray.collider.CompareTag("Player");
+            
+            if (hasLOS)
+            {
+                Debug.DrawRay(origin, direction, Color.green);
+            }
+            else
+            {
+                // Hit a wall or obstacle instead
+                Debug.DrawRay(origin, direction, Color.red);
+            }
+        }
+        else
+        {
+            hasLOS = false;
+        }
     }
-
-
-
-    void Start(){
-        latestDirectionChangeTime = 0f;
-        CalcuateNewMovementVector();
-    }
-
-    void CalcuateNewMovementVector(){
-    //create a random direction vector with the magnitude of 1, later multiply it with the velocity of the enemy
-        movement = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized;
-        OnMovement();
-    }
-
 }
