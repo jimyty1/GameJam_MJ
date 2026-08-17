@@ -38,6 +38,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
     }
     private void OnRun(InputValue value)
     {
+        Debug.Log("run");
         run = value.Get<float>();
         runMod = run*runMultiplier;
     }
